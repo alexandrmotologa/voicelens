@@ -42,7 +42,7 @@ export function TurnInspectorModal({ turn, bargeIn, onClose }: TurnInspectorModa
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050811]/85 p-4">
-      <div className="bg-[#0e1422] border border-cyan-500/30 rounded-2xl w-full max-w-2xl shadow-2xl p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#0e1422] border border-cyan-500/30 rounded-2xl w-full max-w-2xl shadow-2xl p-4 sm:p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -172,8 +172,8 @@ export function TurnInspectorModal({ turn, bargeIn, onClose }: TurnInspectorModa
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => handleDownloadWav('agent')}
               className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 font-mono text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5"
@@ -190,7 +190,7 @@ export function TurnInspectorModal({ turn, bargeIn, onClose }: TurnInspectorModa
 
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-mono text-xs font-semibold cursor-pointer"
+            className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-mono text-xs font-semibold cursor-pointer text-center"
           >
             Close
           </button>

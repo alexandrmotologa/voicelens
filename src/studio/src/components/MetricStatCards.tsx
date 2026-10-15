@@ -18,7 +18,7 @@ export const MetricStatCards: React.FC<MetricStatCardsProps> = ({
   overallStatus,
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
       {/* 1. Turnaround */}
       <div className="glass-panel rounded-xl p-4 flex flex-col gap-1 border-t-2 border-t-cyan-500">
         <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
@@ -84,7 +84,7 @@ export const MetricStatCards: React.FC<MetricStatCardsProps> = ({
       </div>
 
       {/* 5. SLA Status */}
-      <div className="glass-panel rounded-xl p-4 flex flex-col gap-1 border-t-2 border-t-purple-500 col-span-2 md:col-span-1">
+      <div className="glass-panel rounded-xl p-4 flex flex-col gap-1 border-t-2 border-t-purple-500 col-span-1 sm:col-span-2 lg:col-span-1">
         <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
           SLA Compliance
         </span>

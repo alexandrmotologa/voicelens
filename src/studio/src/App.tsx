@@ -298,37 +298,39 @@ export function App() {
   return (
     <div className="flex flex-col min-h-screen bg-[#090d16] text-slate-100">
       {/* Top Navbar */}
-      <header className="border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur sticky top-0 z-40 px-6 py-3 flex flex-col xl:flex-row items-center justify-between gap-4">
+      <header className="border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur sticky top-0 z-40 px-4 sm:px-6 py-3 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
-            VL
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <h1 className="text-base font-extrabold tracking-wider font-mono text-white">
-                VOICELENS
-              </h1>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800">
-                STUDIO v1.1
-              </span>
+        <div className="flex items-center justify-between xl:justify-start gap-3 w-full xl:w-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
+              VL
             </div>
-            <p className="text-[11px] text-slate-400 font-mono">
-              Real-Time Voice AI Latency Profiler &amp; Barge-in Harness
-            </p>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-extrabold tracking-wider font-mono text-white">
+                  VOICELENS
+                </h1>
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800">
+                  STUDIO v1.1
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-mono">
+                Real-Time Voice AI Latency Profiler &amp; Barge-in Harness
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Global Controls & Tools */}
-        <div className="flex flex-wrap items-center gap-2.5 w-full xl:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-start sm:justify-end">
           {/* Target Endpoint Input */}
-          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono">
+          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono flex-1 sm:flex-initial">
             <span className="text-slate-500">Target:</span>
             <input
               type="text"
               value={targetEndpoint}
               onChange={(e) => setTargetEndpoint(e.target.value)}
-              className="bg-transparent text-slate-200 outline-none w-40"
+              className="bg-transparent text-slate-200 outline-none w-full sm:w-40"
               placeholder="ws://localhost:50096"
             />
           </div>
@@ -440,7 +442,7 @@ export function App() {
       </header>
 
       {/* Main Content Dashboard */}
-      <main className="flex-1 p-6 flex flex-col gap-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 px-4 sm:px-6 py-6 flex flex-col gap-6 max-w-7xl mx-auto w-full">
         {/* KPI Stat Cards */}
         <MetricStatCards
           meanTurnaroundMs={summaryStats.meanTurnaround}

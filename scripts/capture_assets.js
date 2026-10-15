@@ -131,6 +131,34 @@ async function capture() {
   console.log('Capturing docs/images/scenario_builder.png...');
   await page.screenshot({ path: path.join(outDir, 'scenario_builder.png') });
 
+  // Close scenario builder
+  await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const cancelBtn = btns.find((b) => b.textContent && (b.textContent.includes('Cancel') || b.textContent.includes('✕')));
+    if (cancelBtn) cancelBtn.click();
+  });
+  await new Promise((r) => setTimeout(r, 600));
+
+  // 8. Capture Mobile Responsive Studio View (iPhone / Smartphone 390x844)
+  console.log('Setting viewport to mobile (390x844)...');
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await new Promise((r) => setTimeout(r, 800));
+  console.log('Capturing docs/images/mobile_studio.png...');
+  await page.screenshot({ path: path.join(outDir, 'mobile_studio.png') });
+
+  // 9. Render crisp 1024x1024 logo.png from logo.svg
+  console.log('Rendering 1024x1024 logo.png from logo.svg...');
+  const logoSvgPath = path.join(outDir, 'logo.svg');
+  if (fs.existsSync(logoSvgPath)) {
+    const logoPage = await browser.newPage();
+    await logoPage.setViewport({ width: 1024, height: 1024, deviceScaleFactor: 1 });
+    const svgContent = fs.readFileSync(logoSvgPath, 'utf8');
+    await logoPage.setContent(`<!DOCTYPE html><html><body style="margin:0;padding:0;background:transparent;overflow:hidden;">${svgContent}</body></html>`);
+    await logoPage.screenshot({ path: path.join(outDir, 'logo.png'), omitBackground: true });
+    await logoPage.close();
+    console.log('High-res logo.png rendered successfully.');
+  }
+
   await browser.close();
   await server.stop();
 

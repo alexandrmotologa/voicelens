@@ -129,14 +129,14 @@ export const AudioOscilloscope: React.FC<AudioOscilloscopeProps> = ({
 
   return (
     <div className="glass-panel rounded-xl p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-3">
           <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
           <h3 className="text-sm font-semibold tracking-wide text-slate-200 uppercase">
             Full-Duplex Dual-Channel Oscilloscope
           </h3>
         </div>
-        <div className="flex items-center gap-4 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
             <span className="text-slate-400">Uplink (User):</span>

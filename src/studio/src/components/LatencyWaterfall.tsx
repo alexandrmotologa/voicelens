@@ -39,11 +39,11 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
 
   return (
     <div className="glass-panel rounded-xl p-5 flex flex-col gap-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <h3 className="text-sm font-semibold tracking-wide text-slate-200 uppercase">
           Acoustic Latency Waterfall Segmentation
         </h3>
-        <div className="flex items-center gap-4 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-mono">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded bg-amber-400"></span>
             <span className="text-slate-400">t_vad (Silence)</span>

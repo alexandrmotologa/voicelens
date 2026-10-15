@@ -154,7 +154,7 @@ export function ScenarioBuilderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050811]/85 p-4 overflow-y-auto">
-      <div className="bg-[#0e1422] border border-cyan-500/30 rounded-2xl w-full max-w-3xl shadow-2xl p-6 flex flex-col gap-5 my-8 max-h-[90vh]">
+      <div className="bg-[#0e1422] border border-cyan-500/30 rounded-2xl w-full max-w-3xl shadow-2xl p-4 sm:p-6 flex flex-col gap-5 my-8 max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -306,10 +306,10 @@ export function ScenarioBuilderModal({
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
           <button
             onClick={handleAddTurn}
-            className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-cyan-400 font-mono text-xs font-semibold cursor-pointer transition-all"
+            className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-cyan-400 font-mono text-xs font-semibold cursor-pointer transition-all text-center"
           >
             + Add Turn
           </button>

@@ -150,6 +150,14 @@ The embedded Web Studio runs locally on port 50095 (or custom port via `--port`)
   <img src="docs/images/barge_in_lab.png" alt="VoiceLens Barge-In Interruption Lab" width="900" />
 </p>
 
+### Responsive Viewport Support
+
+VoiceLens Studio adapts across desktop workstations, tablets, and mobile devices:
+
+<p align="center">
+  <img src="docs/images/mobile_studio.png" alt="VoiceLens Mobile Responsive View" width="380" />
+</p>
+
 ---
 
 ## Latency Attribution Breakdown

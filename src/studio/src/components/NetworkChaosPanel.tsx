@@ -75,7 +75,7 @@ export function NetworkChaosPanel({ isOpen, onClose, onChaosChange }: NetworkCha
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050811]/85 p-4">
-      <div className="bg-[#0e1422] border border-amber-500/30 rounded-2xl w-full max-w-lg shadow-2xl p-6 flex flex-col gap-5">
+      <div className="bg-[#0e1422] border border-amber-500/30 rounded-2xl w-full max-w-lg shadow-2xl p-4 sm:p-6 flex flex-col gap-5">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold">
