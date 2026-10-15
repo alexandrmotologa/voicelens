@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background subtle gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+
+    <!-- Cyan glow gradient -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Ear inner resonance gradient -->
+    <linearGradient id="earGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#083344"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Luxury White Squircle Container -->
+  <rect x="12" y="12" width="1000" height="1000" rx="220" fill="url(#bgGrad)" stroke="#e2e8f0" stroke-width="6"/>
+
+  <!-- 2. Hexagonal Architectural Gateway Frame -->
+  <polygon points="512,106 863,309 863,715 512,918 161,715 161,309"
+           fill="none" stroke="#0f172a" stroke-width="32" stroke-linejoin="round"/>
+  
+  <!-- Inner Dashed Telemetry Ring -->
+  <polygon points="512,130 843,322 843,702 512,894 181,702 181,322"
+           fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="14 10" opacity="0.6"/>
+
+  <!-- Subtle Acoustic Wave Arcs (Sonar Echolocation Waves) -->
+  <path d="M 372 260 A 200 200 0 0 1 652 260" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M 322 220 A 260 260 0 0 1 702 220" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" opacity="0.25"/>
+  <path d="M 272 180 A 320 320 0 0 1 752 180" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
+
+  <!-- 3. Watertight Solid Mascot Base Silhouette -->
+  <path d="M 512 280
+           L 582 170 L 662 130 L 692 210 L 672 350
+           L 772 430 L 822 550 L 762 680 L 682 760 L 512 830
+           L 342 760 L 262 680 L 202 550 L 252 430
+           L 352 350 L 332 210 L 362 130 L 442 170 Z"
+        fill="#090d16"/>
+
+  <!-- Low-Poly Facets: Acoustic Bat Ears -->
+  <!-- Left Ear Inner Shell -->
+  <polygon points="442,170 362,130 332,210" fill="#0f172a"/>
+  <polygon points="362,130 402,240 332,210" fill="#1e293b"/>
+  <polygon points="442,170 402,240 362,130" fill="url(#earGrad)"/>
+  <polygon points="442,170 472,270 402,240" fill="#0e7490"/>
+  <polygon points="402,240 472,270 352,350" fill="#164e63"/>
+  <polygon points="332,210 402,240 352,350" fill="#0f172a"/>
+  <polygon points="332,210 352,350 292,300" fill="#1e293b"/>
+
+  <!-- Right Ear Inner Shell (Symmetrical) -->
+  <polygon points="582,170 662,130 692,210" fill="#0f172a"/>
+  <polygon points="662,130 622,240 692,210" fill="#1e293b"/>
+  <polygon points="582,170 622,240 662,130" fill="url(#earGrad)"/>
+  <polygon points="582,170 552,270 622,240" fill="#0891b2"/>
+  <polygon points="622,240 552,270 672,350" fill="#155e75"/>
+  <polygon points="692,210 622,240 672,350" fill="#0f172a"/>
+  <polygon points="692,210 672,350 732,300" fill="#1e293b"/>
+
+  <!-- Low-Poly Head, Brow, Cranium -->
+  <!-- Forehead Center Peak -->
+  <polygon points="512,280 472,270 442,170" fill="#334155"/>
+  <polygon points="512,280 552,270 582,170" fill="#475569"/>
+  <!-- Central Brow Keel -->
+  <polygon points="512,280 482,370 512,390" fill="#1e293b"/>
+  <polygon points="512,280 542,370 512,390" fill="#334155"/>
+  <polygon points="512,280 472,270 482,370" fill="#334155"/>
+  <polygon points="512,280 552,270 542,370" fill="#475569"/>
+  <polygon points="472,270 352,350 422,380" fill="#1e293b"/>
+  <polygon points="552,270 672,350 602,380" fill="#334155"/>
+  <polygon points="472,270 422,380 482,370" fill="#0f172a"/>
+  <polygon points="552,270 602,380 542,370" fill="#1e293b"/>
+
+  <!-- Temple and Cheek Facets -->
+  <polygon points="422,380 352,350 372,450" fill="#1e293b"/>
+  <polygon points="602,380 672,350 652,450" fill="#334155"/>
+  <polygon points="422,380 482,370 442,460" fill="#0f172a"/>
+  <polygon points="602,380 542,370 582,460" fill="#1e293b"/>
+
+  <!-- Precision Echolocation Eyes (Cant angle upward, sharp polygon sockets) -->
+  <!-- Left Eye Socket & Eye -->
+  <polygon points="482,370 442,460 482,450" fill="#0b1329"/>
+  <polygon points="450,422 476,412 480,436 454,444" fill="#00f5ff"/>
+  <polygon points="460,424 472,420 470,436 458,440" fill="#ffffff"/>
+  <line x1="466" y1="416" x2="466" y2="442" stroke="#083344" stroke-width="2.5"/>
+
+  <!-- Right Eye Socket & Eye -->
+  <polygon points="542,370 582,460 542,450" fill="#0f172a"/>
+  <polygon points="574,422 548,412 544,436 570,444" fill="#00f5ff"/>
+  <polygon points="564,424 552,420 554,436 566,440" fill="#ffffff"/>
+  <line x1="558" y1="416" x2="558" y2="442" stroke="#083344" stroke-width="2.5"/>
+
+  <!-- Acoustic Noseleaf (Ultrasound Beam Focus) -->
+  <polygon points="512,390 482,450 512,470" fill="#0284c7"/>
+  <polygon points="512,390 542,450 512,470" fill="#38bdf8"/>
+  <polygon points="512,470 482,450 492,520 512,540" fill="#0e7490"/>
+  <polygon points="512,470 542,450 532,520 512,540" fill="#06b6d4"/>
+
+  <!-- Lateral Muzzle / Jaws (refined titanium slate, no buck teeth) -->
+  <polygon points="482,450 442,460 452,530 492,520" fill="#1e293b"/>
+  <polygon points="542,450 582,460 572,530 532,520" fill="#334155"/>
+  <polygon points="492,520 452,530 472,580 512,570" fill="#0f172a"/>
+  <polygon points="532,520 572,530 552,580 512,570" fill="#1e293b"/>
+  <!-- Chin Keel -->
+  <polygon points="512,540 492,520 512,570" fill="#334155"/>
+  <polygon points="512,540 532,520 512,570" fill="#475569"/>
+  <polygon points="512,570 472,580 512,620" fill="#0f172a"/>
+  <polygon points="512,570 552,580 512,620" fill="#1e293b"/>
+
+  <!-- Low-Poly Body and Folded Acoustic Armor Wings -->
+  <!-- Chest Plate -->
+  <polygon points="512,620 472,580 432,650 512,710" fill="#1e293b"/>
+  <polygon points="512,620 552,580 592,650 512,710" fill="#334155"/>
+  <polygon points="512,710 432,650 462,760 512,800" fill="#0f172a"/>
+  <polygon points="512,710 592,650 562,760 512,800" fill="#1e293b"/>
+
+  <!-- Left Wing Mantle & Struts -->
+  <polygon points="352,350 422,380 372,450" fill="#0f172a"/>
+  <polygon points="352,350 372,450 252,430" fill="#1e293b"/>
+  <polygon points="252,430 372,450 342,540 202,550" fill="#0f172a"/>
+  <polygon points="372,450 442,460 452,530" fill="#1e293b"/>
+  <polygon points="372,450 452,530 342,540" fill="#334155"/>
+  <polygon points="342,540 452,530 432,650" fill="#1e293b"/>
+  <polygon points="342,540 432,650 332,660 262,680" fill="#0f172a"/>
+  <polygon points="202,550 342,540 262,680" fill="#1e293b"/>
+  <polygon points="432,650 462,760 382,750 332,660" fill="#1e293b"/>
+  <polygon points="332,660 382,750 342,760 262,680" fill="#0f172a"/>
+  <polygon points="462,760 512,800 512,830 462,810" fill="#0f172a"/>
+  <polygon points="462,760 462,810 382,750" fill="#1e293b"/>
+
+  <!-- Right Wing Mantle & Struts (Symmetrical) -->
+  <polygon points="672,350 602,380 652,450" fill="#334155"/>
+  <polygon points="672,350 652,450 772,430" fill="#475569"/>
+  <polygon points="772,430 652,450 682,540 822,550" fill="#1e293b"/>
+  <polygon points="652,450 582,460 572,530" fill="#334155"/>
+  <polygon points="652,450 572,530 682,540" fill="#475569"/>
+  <polygon points="682,540 572,530 592,650" fill="#334155"/>
+  <polygon points="682,540 592,650 692,660 762,680" fill="#1e293b"/>
+  <polygon points="822,550 682,540 762,680" fill="#334155"/>
+  <polygon points="592,650 562,760 642,750 692,660" fill="#334155"/>
+  <polygon points="692,660 642,750 682,760 762,680" fill="#1e293b"/>
+  <polygon points="562,760 512,800 512,830 562,810" fill="#1e293b"/>
+  <polygon points="562,760 562,810 642,750" fill="#334155"/>
+
+  <!-- Precision Cyan Harmonic Accents (Pulse vectors) -->
+  <line x1="512" y1="280" x2="512" y2="390" stroke="#00f5ff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="512" y1="620" x2="512" y2="710" stroke="#00f5ff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="512" cy="540" r="4" fill="#00f5ff"/>
+  <circle cx="512" cy="710" r="4" fill="#00f5ff"/>
+</svg>
