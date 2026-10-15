@@ -1,0 +1,24 @@
+[
+  {
+    "id": "turn_1_greeting",
+    "transcript": "Hello, can you help me check my current account balance and recent transactions?",
+    "durationMs": 1400,
+    "silenceAfterMs": 350,
+    "testBargeIn": false
+  },
+  {
+    "id": "turn_2_interruption",
+    "transcript": "Wait, before you list all transactions, just tell me if my paycheck arrived.",
+    "durationMs": 1300,
+    "silenceAfterMs": 300,
+    "testBargeIn": true,
+    "bargeInOffsetMs": 350
+  },
+  {
+    "id": "turn_3_followup",
+    "transcript": "Perfect, please transfer two hundred dollars to my savings vault.",
+    "durationMs": 1200,
+    "silenceAfterMs": 350,
+    "testBargeIn": false
+  }
+]
