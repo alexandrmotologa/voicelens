@@ -123,11 +123,27 @@ The embedded Web Studio runs locally on port 50095 (or custom port via `--port`)
 
 * **Dual-Channel Oscilloscope:** 60fps HTML5 Canvas visualizer rendering caller uplink (cyan) and agent downlink (violet) waveforms, audio RMS energy, and VAD speech activity.
 * **Latency Waterfall Breakdown:** Horizontal stacked bars segmenting each turn into VAD silence confirmation, network uplink, LLM thinking, and TTS audio delivery.
-* **Barge-In Lab:** Interactive slider to set speech offset, trigger mid-utterance interruptions, and inspect cutoff latency and rogue frame bleed in real time.
-* **Packet Jitter Histogram:** RFC 3550 audio interarrival variance histogram with P50, P95, and P99 percentiles.
+* **Interactive Turn Deep-Dive Inspector:** Click any turn to review exact milestone timestamps and download genuine 24kHz linear PCM `.wav` audio files for both caller and agent channels.
+* **Barge-In Interruption Lab:** Interactive slider to set speech offset, trigger mid-utterance interruptions, and inspect cutoff latency and rogue frame bleed in real time.
+* **Network Degradation & Chaos Simulator:** Inject artificial round-trip delay (RTT), simulated packet loss, and jitter variance on the fly with presets for 4G mobile, congested cellular, and satellite uplinks.
+* **Conversational Scenario Builder:** Author multi-turn dialogue trees, customize utterance timings, configure barge-in offsets per turn, and import/export scenario definitions as JSON.
+* **Audible Speaker & Live Microphone Engine:** Stream 24kHz audio directly through browser speakers with instant hardware cutoff on barge-in, or speak into your microphone to profile your own voice in real time.
+* **One-Click Audit Report Export:** Export structured Markdown compliance reports or raw JSON telemetry ready for engineering review and SLA audits.
 
 <p align="center">
   <img src="docs/images/waterfall_profiler.png" alt="VoiceLens Latency Waterfall Profiler" width="900" />
+</p>
+
+<p align="center">
+  <img src="docs/images/turn_inspector.png" alt="VoiceLens Turn Inspector Modal" width="900" />
+</p>
+
+<p align="center">
+  <img src="docs/images/chaos_lab.png" alt="VoiceLens Network Chaos Simulator" width="900" />
+</p>
+
+<p align="center">
+  <img src="docs/images/scenario_builder.png" alt="VoiceLens Scenario Builder" width="900" />
 </p>
 
 <p align="center">

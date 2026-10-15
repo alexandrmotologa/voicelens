@@ -38,10 +38,17 @@ export const ACOUSTIC_PROFILES: Record<string, AcousticProfile> = {
   },
 };
 
+export interface NetworkChaosConfig {
+  artificialRttMs: number;
+  packetLossPercent: number;
+  jitterVarianceMs: number;
+}
+
 export interface MockServerOptions {
   port?: number;
   profileName?: keyof typeof ACOUSTIC_PROFILES;
   customProfile?: Partial<AcousticProfile>;
+  chaos?: Partial<NetworkChaosConfig>;
 }
 
 export class MockVoiceAgentServer {
@@ -49,6 +56,11 @@ export class MockVoiceAgentServer {
   private wss: WebSocketServer | null = null;
   private port: number;
   private profile: AcousticProfile;
+  private chaos: NetworkChaosConfig = {
+    artificialRttMs: 0,
+    packetLossPercent: 0,
+    jitterVarianceMs: 0,
+  };
   private activeStreams: Map<WebSocket, { timer: NodeJS.Timeout | null; cancelled: boolean }> = new Map();
 
   constructor(options: MockServerOptions = {}) {
@@ -58,6 +70,12 @@ export class MockVoiceAgentServer {
       ...baseProfile,
       ...(options.customProfile ?? {}),
     };
+    if (options.chaos) {
+      this.chaos = {
+        ...this.chaos,
+        ...options.chaos,
+      };
+    }
   }
 
   public async start(): Promise<number> {
@@ -65,7 +83,7 @@ export class MockVoiceAgentServer {
       this.httpServer = createServer((req, res) => {
         if (req.url === '/health') {
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ status: 'ok', profile: this.profile }));
+          res.end(JSON.stringify({ status: 'ok', profile: this.profile, chaos: this.chaos }));
           return;
         }
         res.writeHead(404);
@@ -97,6 +115,17 @@ export class MockVoiceAgentServer {
 
   public getProfile(): AcousticProfile {
     return { ...this.profile };
+  }
+
+  public setChaos(chaos: Partial<NetworkChaosConfig>): void {
+    this.chaos = {
+      ...this.chaos,
+      ...chaos,
+    };
+  }
+
+  public getChaos(): NetworkChaosConfig {
+    return { ...this.chaos };
   }
 
   public getPort(): number {
@@ -172,8 +201,10 @@ export class MockVoiceAgentServer {
   ): void {
     const responseId = 'resp_' + Math.random().toString(36).substring(2, 9);
 
-    // 1. ASR & TTFT delay
-    const ttftDelay = this.profile.asrDurationMs + this.profile.llmTtftMs;
+    // 1. ASR & TTFT delay with simulated RTT
+    const simulatedRttHalf = Math.floor(Math.max(0, this.chaos.artificialRttMs) / 2);
+    const ttftDelay = this.profile.asrDurationMs + this.profile.llmTtftMs + simulatedRttHalf;
+
     state.timer = setTimeout(() => {
       if (state.cancelled || ws.readyState !== WebSocket.OPEN) return;
 
@@ -188,7 +219,7 @@ export class MockVoiceAgentServer {
         if (state.cancelled || ws.readyState !== WebSocket.OPEN) return;
 
         this.streamAudioFrames(ws, responseId, state);
-      }, this.profile.ttsTtfaMs);
+      }, this.profile.ttsTtfaMs + simulatedRttHalf);
 
     }, ttftDelay);
   }
@@ -224,15 +255,20 @@ export class MockVoiceAgentServer {
       const chunk = audioPcm.subarray(offset, end);
       offset = end;
 
-      // Base64 audio delta
-      ws.send(JSON.stringify({
-        type: 'response.audio.delta',
-        response_id: responseId,
-        delta: chunk.toString('base64'),
-      }));
+      // Simulate packet loss: drop frame if loss threshold triggered
+      const shouldDropPacket = this.chaos.packetLossPercent > 0 && (Math.random() * 100 < this.chaos.packetLossPercent);
+      if (!shouldDropPacket) {
+        // Base64 audio delta
+        ws.send(JSON.stringify({
+          type: 'response.audio.delta',
+          response_id: responseId,
+          delta: chunk.toString('base64'),
+        }));
+      }
 
       // Simulate interval with configurable jitter variance
-      const jitterVariance = (Math.random() - 0.5) * 2 * this.profile.packetJitterVarianceMs;
+      const effectiveJitterVariance = Math.max(this.profile.packetJitterVarianceMs, this.chaos.jitterVarianceMs);
+      const jitterVariance = (Math.random() - 0.5) * 2 * effectiveJitterVariance;
       const nextInterval = Math.max(5, 20 + jitterVariance);
 
       state.timer = setTimeout(sendNextFrame, nextInterval);

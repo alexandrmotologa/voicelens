@@ -81,6 +81,56 @@ async function capture() {
   console.log('Capturing docs/images/barge_in_lab.png...');
   await page.screenshot({ path: path.join(outDir, 'barge_in_lab.png') });
 
+  // 5. Open and capture Turn Inspector
+  console.log('Opening Turn Inspector...');
+  await page.evaluate(() => {
+    const turnCard = document.querySelector('div.group.cursor-pointer');
+    if (turnCard) {
+      turnCard.click();
+    }
+  });
+  await new Promise((r) => setTimeout(r, 800));
+  console.log('Capturing docs/images/turn_inspector.png...');
+  await page.screenshot({ path: path.join(outDir, 'turn_inspector.png') });
+
+  // Close turn inspector
+  await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const closeBtn = btns.find((b) => b.textContent && (b.textContent.includes('Close') || b.textContent.includes('✕')));
+    if (closeBtn) closeBtn.click();
+  });
+  await new Promise((r) => setTimeout(r, 600));
+
+  // 6. Open and capture Network Chaos Simulator
+  console.log('Opening Network Chaos Lab...');
+  await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const chaosBtn = btns.find((b) => b.textContent && b.textContent.includes('Chaos'));
+    if (chaosBtn) chaosBtn.click();
+  });
+  await new Promise((r) => setTimeout(r, 800));
+  console.log('Capturing docs/images/chaos_lab.png...');
+  await page.screenshot({ path: path.join(outDir, 'chaos_lab.png') });
+
+  // Close chaos lab
+  await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const doneBtn = btns.find((b) => b.textContent && (b.textContent.includes('Done') || b.textContent.includes('✕')));
+    if (doneBtn) doneBtn.click();
+  });
+  await new Promise((r) => setTimeout(r, 600));
+
+  // 7. Open and capture Scenario Builder
+  console.log('Opening Scenario Builder...');
+  await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const scBtn = btns.find((b) => b.textContent && b.textContent.includes('Scenarios'));
+    if (scBtn) scBtn.click();
+  });
+  await new Promise((r) => setTimeout(r, 800));
+  console.log('Capturing docs/images/scenario_builder.png...');
+  await page.screenshot({ path: path.join(outDir, 'scenario_builder.png') });
+
   await browser.close();
   await server.stop();
 

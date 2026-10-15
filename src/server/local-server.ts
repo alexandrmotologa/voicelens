@@ -6,8 +6,9 @@ import { fileURLToPath } from 'url';
 import { ApiRouter } from './api-router.js';
 import { MockVoiceAgentServer } from '../protocols/mock-voice-agent.js';
 import { OpenAiRealtimeProtocol } from '../protocols/openai-realtime.js';
-import { BenchmarkSuite } from '../core/runner/benchmark-suite.js';
-import { calculateRms } from '../core/audio/pcm-buffer.js';
+import { BenchmarkSuite, TurnScenario } from '../core/runner/benchmark-suite.js';
+import { calculateRms, createWavBuffer } from '../core/audio/pcm-buffer.js';
+import { generateSyntheticUtterance } from '../core/audio/synthetic-voice.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +26,7 @@ export class LocalServer {
   private apiRouter: ApiRouter;
   private mockServer: MockVoiceAgentServer | null = null;
   private connectedWsClients: Set<WebSocket> = new Set();
+  private turnAudioMap: Map<string, { caller: Buffer[]; agent: Buffer[] }> = new Map();
 
   constructor(options: LocalServerOptions = {}) {
     this.port = options.port ?? 50095;
@@ -70,6 +72,24 @@ export class LocalServer {
         this.connectedWsClients.add(ws);
         ws.send(JSON.stringify({ type: 'connected', timestamp: Date.now() }));
 
+        ws.on('message', (rawData) => {
+          try {
+            const msg = JSON.parse(rawData.toString());
+            if (msg.type === 'mic_chunk' && msg.chunkBase64) {
+              const buffer = Buffer.from(msg.chunkBase64, 'base64');
+              const rms = calculateRms(buffer);
+              this.broadcastWs({
+                type: 'audio_level',
+                channel: 'caller',
+                level: rms,
+                timestampMs: Date.now(),
+              });
+            }
+          } catch {
+            // ignore malformed ws message
+          }
+        });
+
         ws.on('close', () => {
           this.connectedWsClients.delete(ws);
         });
@@ -102,10 +122,43 @@ export class LocalServer {
           apiKey,
         });
 
-        const suite = new BenchmarkSuite({ protocol });
+        // Parse custom scenarios if sent from Web Studio
+        const rawScenarios = body?.scenarios as Array<{
+          id: string;
+          transcript: string;
+          durationMs?: number;
+          testBargeIn?: boolean;
+          bargeInOffsetMs?: number;
+        }> | undefined;
 
-        // Forward real-time events to connected Studio UI clients
+        let suiteScenarios: TurnScenario[] | undefined;
+        if (Array.isArray(rawScenarios) && rawScenarios.length > 0) {
+          suiteScenarios = rawScenarios.map((s, idx) => ({
+            id: s.id || `turn_${idx + 1}`,
+            transcript: s.transcript,
+            durationMs: s.durationMs ?? 1400,
+            testBargeIn: !!s.testBargeIn,
+            bargeInOffsetMs: s.bargeInOffsetMs ?? 400,
+          }));
+        }
+
+        const suite = new BenchmarkSuite({ protocol, scenarios: suiteScenarios });
+
+        // Forward real-time events to connected Studio UI clients and store audio
+        suite.on('turn_start', (data) => {
+          this.turnAudioMap.set(data.turnId, { caller: [], agent: [] });
+          this.broadcastWs({
+            type: 'turn_start',
+            turnId: data.turnId,
+            index: data.index,
+            total: data.total,
+          });
+        });
+
         suite.on('caller_frame', (data) => {
+          const entry = this.turnAudioMap.get(data.turnId);
+          if (entry) entry.caller.push(data.chunk);
+
           const rms = calculateRms(data.chunk);
           this.broadcastWs({
             type: 'audio_level',
@@ -116,16 +169,33 @@ export class LocalServer {
         });
 
         suite.on('audio_frame', (data) => {
+          const entry = this.turnAudioMap.get(data.turnId);
+          if (entry) entry.agent.push(data.chunk);
+
           const rms = calculateRms(data.chunk);
           this.broadcastWs({
             type: 'audio_level',
             channel: 'agent',
             level: rms,
             timestampMs: data.timestampMs,
+            chunkBase64: data.chunk.toString('base64'),
+          });
+        });
+
+        suite.on('barge_in_triggered', (data) => {
+          this.broadcastWs({
+            type: 'audio_stop',
+            turnId: data.turnId,
+            reason: 'barge_in',
           });
         });
 
         suite.on('turn_end', (data) => {
+          this.broadcastWs({
+            type: 'audio_stop',
+            turnId: data.turnId,
+            reason: 'turn_end',
+          });
           this.broadcastWs({
             type: 'turn_result',
             turn: data.metrics,
@@ -171,6 +241,59 @@ export class LocalServer {
           ],
         });
 
+        suite.on('turn_start', (data) => {
+          this.turnAudioMap.set(data.turnId, { caller: [], agent: [] });
+          this.broadcastWs({
+            type: 'turn_start',
+            turnId: data.turnId,
+            index: data.index,
+            total: data.total,
+          });
+        });
+
+        suite.on('caller_frame', (data) => {
+          const entry = this.turnAudioMap.get(data.turnId);
+          if (entry) entry.caller.push(data.chunk);
+
+          const rms = calculateRms(data.chunk);
+          this.broadcastWs({
+            type: 'audio_level',
+            channel: 'caller',
+            level: rms,
+            timestampMs: data.timestampMs,
+          });
+        });
+
+        suite.on('audio_frame', (data) => {
+          const entry = this.turnAudioMap.get(data.turnId);
+          if (entry) entry.agent.push(data.chunk);
+
+          const rms = calculateRms(data.chunk);
+          this.broadcastWs({
+            type: 'audio_level',
+            channel: 'agent',
+            level: rms,
+            timestampMs: data.timestampMs,
+            chunkBase64: data.chunk.toString('base64'),
+          });
+        });
+
+        suite.on('barge_in_triggered', (data) => {
+          this.broadcastWs({
+            type: 'audio_stop',
+            turnId: data.turnId,
+            reason: 'barge_in',
+          });
+        });
+
+        suite.on('turn_end', (data) => {
+          this.broadcastWs({
+            type: 'audio_stop',
+            turnId: data.turnId,
+            reason: 'turn_end',
+          });
+        });
+
         const result = await suite.run();
         await protocol.disconnect();
 
@@ -183,6 +306,68 @@ export class LocalServer {
         const message = err instanceof Error ? err.message : 'Barge-in test failed';
         this.apiRouter.sendJson(res, 500, { error: message });
       }
+    });
+
+    // Chaos simulator configuration endpoint
+    this.apiRouter.register('POST /api/network/chaos', async (req, res, body) => {
+      try {
+        const artificialRttMs = typeof body?.artificialRttMs === 'number' ? body.artificialRttMs : 0;
+        const packetLossPercent = typeof body?.packetLossPercent === 'number' ? body.packetLossPercent : 0;
+        const jitterVarianceMs = typeof body?.jitterVarianceMs === 'number' ? body.jitterVarianceMs : 0;
+
+        if (this.mockServer) {
+          this.mockServer.setChaos({ artificialRttMs, packetLossPercent, jitterVarianceMs });
+        }
+
+        this.broadcastWs({
+          type: 'chaos_updated',
+          chaos: { artificialRttMs, packetLossPercent, jitterVarianceMs },
+        });
+
+        this.apiRouter.sendJson(res, 200, {
+          success: true,
+          chaos: this.mockServer?.getChaos(),
+        });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to configure network chaos';
+        this.apiRouter.sendJson(res, 500, { error: message });
+      }
+    });
+
+    this.apiRouter.register('GET /api/network/chaos', (req, res) => {
+      this.apiRouter.sendJson(res, 200, {
+        chaos: this.mockServer ? this.mockServer.getChaos() : { artificialRttMs: 0, packetLossPercent: 0, jitterVarianceMs: 0 },
+      });
+    });
+
+    // Turn audio WAV download endpoint
+    this.apiRouter.register('GET /api/audio/wav', (req, res) => {
+      const parsedUrl = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+      const turnId = parsedUrl.searchParams.get('turnId') || 'turn_1';
+      const channel = parsedUrl.searchParams.get('channel') || 'agent';
+
+      let pcmBuffer: Buffer;
+      const cached = this.turnAudioMap.get(turnId);
+      const chunks = channel === 'caller' ? cached?.caller : cached?.agent;
+
+      if (chunks && chunks.length > 0) {
+        pcmBuffer = Buffer.concat(chunks);
+      } else {
+        pcmBuffer = generateSyntheticUtterance({
+          durationMs: 1400,
+          sampleRate: 24000,
+          vowelSequence: ['a', 'e', 'o', 'i'],
+        });
+      }
+
+      const wavBytes = createWavBuffer(pcmBuffer, 24000, 1);
+      res.writeHead(200, {
+        'Content-Type': 'audio/wav',
+        'Content-Length': wavBytes.length,
+        'Content-Disposition': `attachment; filename="voicelens-${turnId}-${channel}.wav"`,
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(wavBytes);
     });
   }
 

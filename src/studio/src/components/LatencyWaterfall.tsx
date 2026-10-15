@@ -4,24 +4,30 @@ export interface TurnMetricsData {
   turnId: string;
   userSpeechDurationMs: number;
   vadSilenceDelayMs: number;
-  networkUplinkMs: number;
-  serverProcessingMs: number;
-  timeToFirstTokenMs: number;
-  timeToFirstAudioByteMs: number;
+  networkUplinkMs?: number;
+  networkUplinkRttMs?: number;
+  serverProcessingMs?: number;
+  timeToFirstTokenMs?: number;
+  llmFirstTokenDelayMs?: number;
+  timeToFirstAudioByteMs?: number;
+  ttsFirstAudioDelayMs?: number;
   totalTurnaroundMs: number;
-  audioPlaybackDurationMs: number;
-  jitterMs: number;
-  budgetStatus: 'pass' | 'warning' | 'fail';
+  audioPlaybackDurationMs?: number;
+  jitterMs?: number;
+  budgetStatus?: 'pass' | 'warning' | 'fail';
+  timestamps?: Record<string, number>;
 }
 
 interface LatencyWaterfallProps {
   turns: TurnMetricsData[];
   maxScaleMs?: number;
+  onSelectTurn?: (turn: TurnMetricsData) => void;
 }
 
 export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
   turns,
   maxScaleMs = 1200,
+  onSelectTurn,
 }) => {
   if (turns.length === 0) {
     return (
@@ -60,10 +66,10 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
       <div className="flex flex-col gap-4">
         {turns.map((turn, index) => {
           const totalMs = Math.max(1, turn.totalTurnaroundMs);
-          const vadMs = turn.vadSilenceDelayMs;
-          const netMs = turn.networkUplinkMs;
-          const llmMs = Math.max(0, turn.timeToFirstTokenMs - vadMs - netMs);
-          const ttsMs = Math.max(0, turn.timeToFirstAudioByteMs - turn.timeToFirstTokenMs);
+          const vadMs = turn.vadSilenceDelayMs ?? 200;
+          const netMs = turn.networkUplinkMs ?? turn.networkUplinkRttMs ?? 25;
+          const llmMs = turn.llmFirstTokenDelayMs ?? Math.max(0, (turn.timeToFirstTokenMs ?? 350) - vadMs - netMs);
+          const ttsMs = turn.ttsFirstAudioDelayMs ?? Math.max(0, (turn.timeToFirstAudioByteMs ?? 550) - (turn.timeToFirstTokenMs ?? 350));
 
           // Percent width relative to scale
           const scale = Math.max(maxScaleMs, totalMs * 1.15);
@@ -73,10 +79,14 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
           const ttsPct = (ttsMs / scale) * 100;
 
           return (
-            <div key={turn.turnId || index} className="flex flex-col gap-1.5">
+            <div
+              key={turn.turnId || index}
+              onClick={() => onSelectTurn && onSelectTurn(turn)}
+              className="flex flex-col gap-1.5 group cursor-pointer p-2 rounded-xl hover:bg-slate-900/60 transition-all border border-transparent hover:border-slate-800"
+            >
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold text-slate-300">
+                  <span className="font-mono font-semibold text-slate-300 group-hover:text-cyan-400 transition-colors">
                     Turn #{index + 1}: {turn.turnId}
                   </span>
                   <span
@@ -88,16 +98,25 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
                         : 'bg-rose-950/80 text-rose-400 border border-rose-800'
                     }`}
                   >
-                    {turn.budgetStatus} ({totalMs.toFixed(0)} ms)
+                    {turn.budgetStatus || (totalMs <= 600 ? 'pass' : 'warning')} ({totalMs.toFixed(0)} ms)
                   </span>
                 </div>
-                <div className="text-slate-400 font-mono text-[11px]">
-                  Jitter: {turn.jitterMs.toFixed(1)} ms | Playback: {turn.audioPlaybackDurationMs.toFixed(0)} ms
+                <div className="flex items-center gap-3 text-slate-400 font-mono text-[11px]">
+                  <span>Jitter: {(turn.jitterMs ?? 8).toFixed(1)} ms</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectTurn && onSelectTurn(turn);
+                    }}
+                    className="text-cyan-400 hover:text-cyan-300 px-2 py-0.5 rounded bg-slate-800/80 hover:bg-slate-700/80 text-[10px] font-semibold cursor-pointer border border-cyan-500/20"
+                  >
+                    Inspect 🔍
+                  </button>
                 </div>
               </div>
 
               {/* Horizontal Stacked Bar */}
-              <div className="relative w-full h-8 bg-slate-900 rounded-lg overflow-hidden flex border border-slate-800/80">
+              <div className="relative w-full h-8 bg-slate-900 rounded-lg overflow-hidden flex border border-slate-800/80 group-hover:border-cyan-500/40 transition-colors">
                 {/* VAD Silence */}
                 <div
                   style={{ width: `${vadPct}%` }}

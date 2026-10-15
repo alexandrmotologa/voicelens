@@ -115,4 +115,24 @@ describe('mock voice agent & openai realtime protocol', () => {
 
     await protocol.disconnect();
   });
+
+  it('should support dynamic network chaos degradation configuration', () => {
+    expect(server.getChaos().artificialRttMs).toBe(0);
+
+    server.setChaos({
+      artificialRttMs: 120,
+      packetLossPercent: 5,
+      jitterVarianceMs: 15,
+    });
+
+    const chaos = server.getChaos();
+    expect(chaos.artificialRttMs).toBe(120);
+    expect(chaos.packetLossPercent).toBe(5);
+    expect(chaos.jitterVarianceMs).toBe(15);
+
+    // Reset chaos
+    server.setChaos({ artificialRttMs: 0, packetLossPercent: 0, jitterVarianceMs: 0 });
+    expect(server.getChaos().artificialRttMs).toBe(0);
+  });
 });
+
