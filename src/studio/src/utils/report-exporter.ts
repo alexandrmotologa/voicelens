@@ -45,11 +45,11 @@ export function generateMarkdownReport(
   md += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
 
   for (const t of turns) {
-    const vadMs = t.vadSilenceDelayMs ?? 200;
-    const netMs = t.networkUplinkMs ?? t.networkUplinkRttMs ?? 25;
-    const ttftMs = t.llmFirstTokenDelayMs ?? Math.max(0, (t.timeToFirstTokenMs ?? 350) - vadMs - netMs);
-    const ttfaMs = t.ttsFirstAudioDelayMs ?? Math.max(0, (t.timeToFirstAudioByteMs ?? 550) - (t.timeToFirstTokenMs ?? 350));
-    const totalMs = t.totalTurnaroundMs ?? 600;
+    const vadMs = t.vadSilenceDelayMs || 0;
+    const netMs = t.networkUplinkMs ?? t.networkUplinkRttMs ?? 0;
+    const ttftMs = t.llmFirstTokenDelayMs ?? (t.timeToFirstTokenMs ? Math.max(0, t.timeToFirstTokenMs - vadMs - netMs) : 0);
+    const ttfaMs = t.ttsFirstAudioDelayMs ?? (t.timeToFirstAudioByteMs && t.timeToFirstTokenMs ? Math.max(0, t.timeToFirstAudioByteMs - t.timeToFirstTokenMs) : 0);
+    const totalMs = t.totalTurnaroundMs || 0;
 
     const vad = `${vadMs.toFixed(0)} ms`;
     const net = `${netMs.toFixed(0)} ms`;
@@ -70,7 +70,7 @@ export function generateMarkdownReport(
     for (let i = 0; i < bargeIns.length; i++) {
       const b = bargeIns[i];
       const offset = `${b.injectionOffsetMs} ms`;
-      const cutoffVal = b.interruptionResponseDelayMs ?? (b as any).cutoffLatencyMs ?? 110;
+      const cutoffVal = b.interruptionResponseDelayMs ?? (b as any).cutoffLatencyMs ?? 0;
       const cutoff = `${cutoffVal.toFixed(0)} ms`;
       const bleedDur = `${(b.bleedDurationMs ?? (b as any).bufferBleedDurationMs ?? 0).toFixed(0)} ms`;
       const bytes = `${b.discardedAudioBytes ?? (b as any).bufferBleedBytes ?? 0} B`;

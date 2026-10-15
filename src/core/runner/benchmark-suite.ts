@@ -143,7 +143,10 @@ export class BenchmarkSuite extends EventEmitter {
         turnCompleted = true;
         cleanup();
 
-        const turnMetrics = tracker.finalize(jitterCalc.getJitter());
+        const turnMetrics = {
+          ...tracker.finalize(jitterCalc.getJitter()),
+          jitterReport: jitterCalc.generateReport(),
+        };
         const bargeInMetrics = bargeInTracker ? bargeInTracker.evaluate() : undefined;
         resolve({ turnMetrics, bargeInMetrics });
       };

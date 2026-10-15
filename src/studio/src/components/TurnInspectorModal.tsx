@@ -25,10 +25,10 @@ export function TurnInspectorModal({ turn, bargeIn, onClose }: TurnInspectorModa
 
   const status = getTurnStatus(turn.totalTurnaroundMs);
 
-  const vadMs = turn.vadSilenceDelayMs ?? 200;
-  const netMs = turn.networkUplinkMs ?? turn.networkUplinkRttMs ?? 25;
-  const llmMs = turn.llmFirstTokenDelayMs ?? Math.max(0, (turn.timeToFirstTokenMs ?? 350) - vadMs - netMs);
-  const ttsMs = turn.ttsFirstAudioDelayMs ?? Math.max(0, (turn.timeToFirstAudioByteMs ?? 550) - (turn.timeToFirstTokenMs ?? 350));
+  const vadMs = turn.vadSilenceDelayMs || 0;
+  const netMs = turn.networkUplinkMs ?? turn.networkUplinkRttMs ?? 0;
+  const llmMs = turn.llmFirstTokenDelayMs ?? (turn.timeToFirstTokenMs ? Math.max(0, turn.timeToFirstTokenMs - vadMs - netMs) : 0);
+  const ttsMs = turn.ttsFirstAudioDelayMs ?? (turn.timeToFirstAudioByteMs && turn.timeToFirstTokenMs ? Math.max(0, turn.timeToFirstAudioByteMs - turn.timeToFirstTokenMs) : 0);
 
   const handleDownloadWav = (channel: 'agent' | 'caller' = 'agent') => {
     const url = `/api/audio/wav?turnId=${encodeURIComponent(turn.turnId)}&channel=${channel}`;
@@ -151,7 +151,7 @@ export function TurnInspectorModal({ turn, bargeIn, onClose }: TurnInspectorModa
                 Barge-in Interruption Metrics
               </span>
               <span className="text-rose-400 font-bold">
-                Cutoff: {(bargeIn.interruptionResponseDelayMs ?? (bargeIn as any).cutoffLatencyMs ?? 110).toFixed(0)} ms
+                Cutoff: {(bargeIn.interruptionResponseDelayMs ?? (bargeIn as any).cutoffLatencyMs ?? 0).toFixed(0)} ms
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 text-slate-400 mt-1">

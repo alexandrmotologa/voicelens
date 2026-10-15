@@ -15,11 +15,14 @@ export interface BenchmarkSummary {
   passedTurns: number;
   warningTurns: number;
   failedTurns: number;
+  totalAudioPackets: number;
+  totalAudioBytes: number;
   turnaroundStats: AggregateStats;
   ttfaStats: AggregateStats;
   ttftStats: AggregateStats;
   vadSilenceStats: AggregateStats;
   jitterStats: AggregateStats;
+  jitterHistogram: { bucketLabel: string; count: number }[];
   bargeInSummary?: {
     totalTests: number;
     passedTests: number;
@@ -71,6 +74,17 @@ export class BudgetEvaluator {
     const ttfts: number[] = [];
     const vads: number[] = [];
     const jitters: number[] = [];
+    let totalAudioPackets = 0;
+    let totalAudioBytes = 0;
+
+    const aggregatedHistogram = [
+      { bucketLabel: '0-5ms', count: 0 },
+      { bucketLabel: '5-15ms', count: 0 },
+      { bucketLabel: '15-30ms', count: 0 },
+      { bucketLabel: '30-60ms', count: 0 },
+      { bucketLabel: '60-100ms', count: 0 },
+      { bucketLabel: '>100ms', count: 0 },
+    ];
 
     for (const turn of turns) {
       turnarounds.push(turn.totalTurnaroundMs);
@@ -78,6 +92,15 @@ export class BudgetEvaluator {
       ttfts.push(turn.timeToFirstTokenMs);
       vads.push(turn.vadSilenceDelayMs);
       jitters.push(turn.jitterMs);
+      totalAudioPackets += turn.audioPacketCount ?? 0;
+      totalAudioBytes += turn.audioBytesReceived ?? 0;
+
+      if (turn.jitterReport?.histogram) {
+        for (const item of turn.jitterReport.histogram) {
+          const match = aggregatedHistogram.find((b) => b.bucketLabel === item.bucketLabel);
+          if (match) match.count += item.count;
+        }
+      }
 
       if (turn.budgetStatus === 'pass') passedTurns++;
       else if (turn.budgetStatus === 'warning') warningTurns++;
@@ -115,11 +138,14 @@ export class BudgetEvaluator {
       passedTurns,
       warningTurns,
       failedTurns,
+      totalAudioPackets,
+      totalAudioBytes,
       turnaroundStats: computeStats(turnarounds),
       ttfaStats: computeStats(ttfas),
       ttftStats: computeStats(ttfts),
       vadSilenceStats: computeStats(vads),
       jitterStats: computeStats(jitters),
+      jitterHistogram: aggregatedHistogram,
       bargeInSummary,
       overallStatus,
     };

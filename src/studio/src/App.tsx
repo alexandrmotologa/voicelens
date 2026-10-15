@@ -38,11 +38,11 @@ export function App() {
 
   // Jitter histogram state
   const [jitterBuckets, setJitterBuckets] = useState<JitterBucket[]>([
-    { bucketLabel: '0-5ms', count: 18 },
-    { bucketLabel: '5-15ms', count: 42 },
-    { bucketLabel: '15-30ms', count: 12 },
-    { bucketLabel: '30-60ms', count: 3 },
-    { bucketLabel: '60-100ms', count: 1 },
+    { bucketLabel: '0-5ms', count: 0 },
+    { bucketLabel: '5-15ms', count: 0 },
+    { bucketLabel: '15-30ms', count: 0 },
+    { bucketLabel: '30-60ms', count: 0 },
+    { bucketLabel: '60-100ms', count: 0 },
     { bucketLabel: '>100ms', count: 0 },
   ]);
 
@@ -165,6 +165,9 @@ export function App() {
           meanTtft: data.summary.ttftStats.mean,
           meanJitter: data.summary.jitterStats.mean,
         });
+        if (data.summary.jitterHistogram) {
+          setJitterBuckets(data.summary.jitterHistogram);
+        }
         if (data.bargeIns && data.bargeIns.length > 0) {
           setLatestBargeIn(data.bargeIns[0]);
         }
@@ -196,6 +199,9 @@ export function App() {
         setLatestBargeIn(data.bargeIn);
         if (data.turn) {
           setTurns((prev) => [data.turn, ...prev]);
+          if (data.turn.jitterReport?.histogram) {
+            setJitterBuckets(data.turn.jitterReport.histogram);
+          }
         }
         return data.bargeIn;
       }
@@ -469,8 +475,8 @@ export function App() {
 
             <JitterHistogram
               buckets={jitterBuckets}
-              sampleCount={76}
-              rfcJitterMs={summaryStats.meanJitter || 12.4}
+              sampleCount={turns.reduce((acc, t) => acc + (t.audioPacketCount ?? 0), 0)}
+              rfcJitterMs={summaryStats.meanJitter}
             />
 
             {/* Conversation Scenarios Card */}

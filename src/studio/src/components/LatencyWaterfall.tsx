@@ -65,11 +65,11 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
 
       <div className="flex flex-col gap-4">
         {turns.map((turn, index) => {
-          const totalMs = Math.max(1, turn.totalTurnaroundMs);
-          const vadMs = turn.vadSilenceDelayMs ?? 200;
-          const netMs = turn.networkUplinkMs ?? turn.networkUplinkRttMs ?? 25;
-          const llmMs = turn.llmFirstTokenDelayMs ?? Math.max(0, (turn.timeToFirstTokenMs ?? 350) - vadMs - netMs);
-          const ttsMs = turn.ttsFirstAudioDelayMs ?? Math.max(0, (turn.timeToFirstAudioByteMs ?? 550) - (turn.timeToFirstTokenMs ?? 350));
+          const totalMs = Math.max(1, turn.totalTurnaroundMs || 0);
+          const vadMs = turn.vadSilenceDelayMs || 0;
+          const netMs = turn.networkUplinkMs ?? turn.networkUplinkRttMs ?? 0;
+          const llmMs = turn.llmFirstTokenDelayMs ?? (turn.timeToFirstTokenMs ? Math.max(0, turn.timeToFirstTokenMs - vadMs - netMs) : 0);
+          const ttsMs = turn.ttsFirstAudioDelayMs ?? (turn.timeToFirstAudioByteMs && turn.timeToFirstTokenMs ? Math.max(0, turn.timeToFirstAudioByteMs - turn.timeToFirstTokenMs) : 0);
 
           // Percent width relative to scale
           const scale = Math.max(maxScaleMs, totalMs * 1.15);
@@ -102,7 +102,7 @@ export const LatencyWaterfall: React.FC<LatencyWaterfallProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-400 font-mono text-[11px]">
-                  <span>Jitter: {(turn.jitterMs ?? 8).toFixed(1)} ms</span>
+                  <span>Jitter: {(turn.jitterMs ?? 0).toFixed(1)} ms</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

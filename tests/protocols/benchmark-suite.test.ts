@@ -59,5 +59,10 @@ describe('benchmark suite execution', () => {
 
     expect(result.summary.totalTurns).toBe(2);
     expect(result.summary.turnaroundStats.mean).toBeGreaterThan(0);
+    expect(result.summary.totalAudioPackets).toBeGreaterThan(0);
+    expect(result.summary.jitterHistogram.length).toBe(6);
+    expect(result.turns[0].audioPacketCount).toBeGreaterThan(0);
+    expect(result.turns[0].audioBytesReceived).toBeGreaterThan(0);
+    expect(result.turns[0].jitterReport).toBeDefined();
   }, 20000);
 });

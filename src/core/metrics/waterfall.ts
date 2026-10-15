@@ -4,6 +4,8 @@
  * User Speech -> VAD Silence -> Uplink -> TTFT (ASR + LLM) -> TTFA (TTS) -> Playback
  */
 
+import { JitterReport } from './jitter.js';
+
 export type BudgetStatus = 'pass' | 'warning' | 'fail';
 
 export interface LatencyBudget {
@@ -40,8 +42,11 @@ export interface VoiceTurnMetrics {
   totalTurnaroundMs: number;        // From user speech stopped until first audio heard
   audioPlaybackDurationMs: number;  // Agent total speech response duration
   jitterMs: number;                 // RFC 3550 audio frame arrival variance
+  audioPacketCount: number;         // Actual audio chunks received
+  audioBytesReceived: number;       // Total audio payload bytes received
   budgetStatus: BudgetStatus;
   timestamps: TurnTimestamps;
+  jitterReport?: JitterReport;
 }
 
 export class TurnTracker {
@@ -140,6 +145,8 @@ export class TurnTracker {
       totalTurnaroundMs,
       audioPlaybackDurationMs,
       jitterMs,
+      audioPacketCount: this.audioChunkArrivals.length,
+      audioBytesReceived: this.totalAudioBytes,
       budgetStatus,
       timestamps: completeTimestamps,
     };
